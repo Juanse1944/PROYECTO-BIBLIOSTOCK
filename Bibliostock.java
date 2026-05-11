@@ -2,50 +2,35 @@ package main;
 
 import java.util.Scanner;
 
-class Libro {
-
-    String titulo;
-    String autor;
-    String isbn;
-
-    int stock;
-    int prestados;
-
-    double precio;
-
-    double calcularValor() {
-        return stock * precio;
-    }
-}
-
-class Usuario {
-
-    String nombre;
-    int clave;
-    String rol;
-}
-
 public class Bibliostock {
 
     static Scanner scanner = new Scanner(System.in);
 
-    static Libro[] libros = new Libro[100];
-    static Usuario[] usuarios = new Usuario[50];
+    static String[] titulos = new String[100];
+    static String[] autores = new String[100];
+    static String[] isbn = new String[100];
+
+    static int[] stock = new int[100];
+    static int[] prestados = new int[100];
+
+    static double[] precios = new double[100];
 
     static int cantidadLibros = 0;
+
+    static String[] usuarios = new String[50];
+    static int[] claves = new int[50];
+    static String[] roles = new String[50];
+
     static int cantidadUsuarios = 1;
 
-    static Usuario usuarioActual;
+    static String usuarioActual = "";
+    static String rolActual = "";
 
     public static void main(String[] args) {
 
-        Usuario admin = new Usuario();
-
-        admin.nombre = "admin";
-        admin.clave = 12345;
-        admin.rol = "admin";
-
-        usuarios[0] = admin;
+        usuarios[0] = "admin";
+        claves[0] = 12345;
+        roles[0] = "admin";
 
         iniciarSesion();
     }
@@ -62,7 +47,7 @@ public class Bibliostock {
             System.out.println("==============================");
 
             System.out.print("Usuario: ");
-            String nombre = scanner.nextLine();
+            String usuario = scanner.nextLine();
 
             System.out.print("Clave numerica: ");
             int clave = scanner.nextInt();
@@ -70,17 +55,18 @@ public class Bibliostock {
 
             for (int i = 0; i < cantidadUsuarios; i++) {
 
-                if (usuarios[i].nombre.equals(nombre)
-                        && usuarios[i].clave == clave) {
+                if (usuarios[i].equals(usuario)
+                        && claves[i] == clave) {
 
                     usuarioActual = usuarios[i];
+                    rolActual = roles[i];
 
                     acceso = true;
 
                     System.out.println();
-                    System.out.println("Bienvenido " + usuarioActual.nombre);
+                    System.out.println("Bienvenido " + usuarioActual);
 
-                    if (usuarioActual.rol.equals("admin")) {
+                    if (rolActual.equals("admin")) {
 
                         menuAdmin();
 
@@ -220,20 +206,18 @@ public class Bibliostock {
         System.out.println();
         System.out.println("===== AGREGAR LIBRO =====");
 
-        Libro nuevo = new Libro();
-
         System.out.print("Titulo: ");
-        nuevo.titulo = scanner.nextLine();
+        titulos[cantidadLibros] = scanner.nextLine();
 
         System.out.print("Autor: ");
-        nuevo.autor = scanner.nextLine();
+        autores[cantidadLibros] = scanner.nextLine();
 
         System.out.print("ISBN: ");
-        nuevo.isbn = scanner.nextLine();
+        isbn[cantidadLibros] = scanner.nextLine();
 
         for (int i = 0; i < cantidadLibros; i++) {
 
-            if (libros[i].isbn.equals(nuevo.isbn)) {
+            if (isbn[i].equals(isbn[cantidadLibros])) {
 
                 System.out.println();
                 System.out.println("El ISBN ya existe");
@@ -242,16 +226,14 @@ public class Bibliostock {
         }
 
         System.out.print("Stock: ");
-        nuevo.stock = scanner.nextInt();
+        stock[cantidadLibros] = scanner.nextInt();
 
         System.out.print("Precio: ");
-        nuevo.precio = scanner.nextDouble();
+        precios[cantidadLibros] = scanner.nextDouble();
 
         scanner.nextLine();
 
-        nuevo.prestados = 0;
-
-        libros[cantidadLibros] = nuevo;
+        prestados[cantidadLibros] = 0;
 
         cantidadLibros++;
 
@@ -263,23 +245,23 @@ public class Bibliostock {
 
         System.out.println();
         System.out.print("Ingrese ISBN: ");
-        String isbn = scanner.nextLine();
+        String buscar = scanner.nextLine();
 
         for (int i = 0; i < cantidadLibros; i++) {
 
-            if (libros[i].isbn.equals(isbn)) {
+            if (isbn[i].equals(buscar)) {
 
                 System.out.print("Nuevo titulo: ");
-                libros[i].titulo = scanner.nextLine();
+                titulos[i] = scanner.nextLine();
 
                 System.out.print("Nuevo autor: ");
-                libros[i].autor = scanner.nextLine();
+                autores[i] = scanner.nextLine();
 
                 System.out.print("Nuevo stock: ");
-                libros[i].stock = scanner.nextInt();
+                stock[i] = scanner.nextInt();
 
                 System.out.print("Nuevo precio: ");
-                libros[i].precio = scanner.nextDouble();
+                precios[i] = scanner.nextDouble();
 
                 scanner.nextLine();
 
@@ -298,18 +280,23 @@ public class Bibliostock {
 
         System.out.println();
         System.out.print("Ingrese ISBN: ");
-        String isbn = scanner.nextLine();
+        String buscar = scanner.nextLine();
 
         for (int i = 0; i < cantidadLibros; i++) {
 
-            if (libros[i].isbn.equals(isbn)) {
+            if (isbn[i].equals(buscar)) {
 
                 for (int j = i; j < cantidadLibros - 1; j++) {
 
-                    libros[j] = libros[j + 1];
-                }
+                    titulos[j] = titulos[j + 1];
+                    autores[j] = autores[j + 1];
+                    isbn[j] = isbn[j + 1];
 
-                libros[cantidadLibros - 1] = null;
+                    stock[j] = stock[j + 1];
+                    prestados[j] = prestados[j + 1];
+
+                    precios[j] = precios[j + 1];
+                }
 
                 cantidadLibros--;
 
@@ -341,26 +328,36 @@ public class Bibliostock {
             System.out.println();
             System.out.println("Libro #" + (i + 1));
 
-            System.out.println("Titulo    : " + libros[i].titulo);
-            System.out.println("Autor     : " + libros[i].autor);
-            System.out.println("ISBN      : " + libros[i].isbn);
-            System.out.println("Stock     : " + libros[i].stock);
-            System.out.println("Prestados : " + libros[i].prestados);
-            System.out.println("Precio    : $" + libros[i].precio);
+            System.out.println("Titulo    : " + titulos[i]);
+            System.out.println("Autor     : " + autores[i]);
+            System.out.println("ISBN      : " + isbn[i]);
+            System.out.println("Stock     : " + stock[i]);
+            System.out.println("Prestados : " + prestados[i]);
+            System.out.println("Precio    : $" + precios[i]);
         }
     }
 
     static void mostrarResumen() {
 
         int totalStock = 0;
-
         double valorTotal = 0;
+
+        int mayor = 0;
+        int menor = 0;
 
         for (int i = 0; i < cantidadLibros; i++) {
 
-            totalStock += libros[i].stock;
+            totalStock += stock[i];
 
-            valorTotal += libros[i].calcularValor();
+            valorTotal += stock[i] * precios[i];
+
+            if (stock[i] > stock[mayor]) {
+                mayor = i;
+            }
+
+            if (stock[i] < stock[menor]) {
+                menor = i;
+            }
         }
 
         System.out.println();
@@ -369,6 +366,14 @@ public class Bibliostock {
         System.out.println("Total libros     : " + cantidadLibros);
         System.out.println("Total unidades   : " + totalStock);
         System.out.println("Valor inventario : $" + valorTotal);
+
+        if (cantidadLibros > 0) {
+
+            System.out.println();
+            System.out.println("Libro con mayor stock: " + titulos[mayor]);
+
+            System.out.println("Libro con menor stock: " + titulos[menor]);
+        }
     }
 
     static void crearUsuario() {
@@ -376,12 +381,10 @@ public class Bibliostock {
         System.out.println();
         System.out.println("===== CREAR USUARIO =====");
 
-        Usuario nuevo = new Usuario();
-
         System.out.print("Nombre usuario: ");
-        nuevo.nombre = scanner.nextLine();
+        usuarios[cantidadUsuarios] = scanner.nextLine();
 
-        if (!nuevo.nombre.matches("[a-zA-Z]+")) {
+        if (!usuarios[cantidadUsuarios].matches("[a-zA-Z]+")) {
 
             System.out.println();
             System.out.println("El usuario solo debe tener letras");
@@ -389,13 +392,11 @@ public class Bibliostock {
         }
 
         System.out.print("Clave numerica: ");
-        nuevo.clave = scanner.nextInt();
+        claves[cantidadUsuarios] = scanner.nextInt();
         scanner.nextLine();
 
         System.out.print("Rol (admin/estudiante): ");
-        nuevo.rol = scanner.nextLine();
-
-        usuarios[cantidadUsuarios] = nuevo;
+        roles[cantidadUsuarios] = scanner.nextLine();
 
         cantidadUsuarios++;
 
@@ -413,11 +414,12 @@ public class Bibliostock {
 
         for (int i = 0; i < cantidadUsuarios; i++) {
 
-            if (usuarios[i].nombre.equals(nombre)) {
+            if (usuarios[i].equals(nombre)) {
 
                 System.out.println();
                 System.out.println("Usuario encontrado");
-                System.out.println("Rol actual: " + usuarios[i].rol);
+
+                System.out.println("Rol actual: " + roles[i]);
 
                 System.out.print("Nuevo rol (admin/estudiante): ");
                 String nuevoRol = scanner.nextLine();
@@ -425,7 +427,7 @@ public class Bibliostock {
                 if (nuevoRol.equals("admin")
                         || nuevoRol.equals("estudiante")) {
 
-                    usuarios[i].rol = nuevoRol;
+                    roles[i] = nuevoRol;
 
                     System.out.println();
                     System.out.println("Permisos actualizados");
@@ -448,17 +450,17 @@ public class Bibliostock {
 
         System.out.println();
         System.out.print("Ingrese ISBN del libro: ");
-        String isbn = scanner.nextLine();
+        String buscar = scanner.nextLine();
 
         for (int i = 0; i < cantidadLibros; i++) {
 
-            if (libros[i].isbn.equals(isbn)) {
+            if (isbn[i].equals(buscar)) {
 
-                if (libros[i].stock > 0) {
+                if (stock[i] > 0) {
 
-                    libros[i].stock--;
+                    stock[i]--;
 
-                    libros[i].prestados++;
+                    prestados[i]++;
 
                     System.out.println();
                     System.out.println("Libro prestado");
